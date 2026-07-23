@@ -1,0 +1,1554 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VoltMatrix AI - Futuristic Engineering Platform</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600&family=Orbitron:wght@400;700&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Space Grotesk"', 'sans-serif'],
+            mono: ['"Fira Code"', 'monospace'],
+            orbitron: ['"Orbitron"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    html {
+      background-color: #020617;
+    }
+    body {
+      background-color: #020617 !important;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    /* Beautiful Frosted Glass card definitions replacing hard cyberpunk ones */
+    .neon-border {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+      border-radius: 1rem;
+    }
+    .neon-border-magenta {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(244, 63, 94, 0.15);
+      box-shadow: 0 8px 32px 0 rgba(244, 63, 94, 0.04);
+      border-radius: 1rem;
+    }
+    .neon-text { 
+      text-shadow: 0 0 10px rgba(6, 182, 212, 0.4); 
+    }
+    .scanline {
+      background-image: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.12) 50%), linear-gradient(90deg, rgba(59, 130, 246, 0.02), rgba(168, 85, 247, 0.02), rgba(6, 182, 212, 0.02));
+      background-size: 100% 4px, 6px 100%;
+    }
+  </style>
+</head>
+<body class="text-slate-200 min-h-screen relative overflow-x-hidden scanline pb-6 bg-[#020617]">
+  <!-- Glowing Background Blobs for Frosted Glass Effect -->
+  <div class="absolute inset-0 opacity-35 pointer-events-none z-0 overflow-hidden">
+    <div class="absolute top-[10%] left-[5%] w-[500px] h-[500px] rounded-full bg-cyan-500/15 blur-[120px]"></div>
+    <div class="absolute bottom-[20%] right-[10%] w-[600px] h-[600px] rounded-full bg-purple-500/10 blur-[130px]"></div>
+    <div class="absolute top-[40%] right-[30%] w-[400px] h-[400px] rounded-full bg-blue-500/10 blur-[110px]"></div>
+  </div>
+
+  <!-- Particle Background -->
+  <canvas id="bg-canvas" class="absolute inset-0 pointer-events-none opacity-40 z-0"></canvas>
+
+  <!-- REBOOT MODAL -->
+  <div id="reboot-screen" class="fixed inset-0 bg-black z-50 flex-col items-center justify-center font-mono p-6 hidden">
+    <div class="max-w-xl w-full">
+      <div class="text-cyan-400 mb-4 text-xl font-bold"><i class="fa-solid fa-triangle-exclamation animate-pulse"></i> SYSTEM RESET INITIATED</div>
+      <div id="reboot-log" class="text-xs text-emerald-400 space-y-1 h-64 overflow-y-auto bg-neutral-900/80 p-4 border border-emerald-500/30 rounded"></div>
+      <div class="mt-4 flex justify-between text-xs text-slate-500">
+        <span>VOLTMATRIX COGNITIVE v4.81</span>
+        <span class="animate-pulse">ONLINE SECURING...</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="relative z-10 max-w-[1600px] mx-auto px-4 lg:px-6 pt-4">
+    <!-- HEADER -->
+    <header class="neon-border p-4 mb-6 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-600/20 flex items-center justify-center text-cyan-400 border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.15)] animate-pulse">
+          <i class="fa-solid fa-bolt text-xl"></i>
+        </div>
+        <div>
+          <h1 class="text-2xl font-extrabold tracking-wider font-orbitron neon-text text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-300">VOLTMATRIX AI</h1>
+          <p class="text-[10px] tracking-widest text-slate-400 uppercase">Futuristic AI-Powered Electronics Engineering Suite</p>
+        </div>
+      </div>
+      
+      <!-- Telemetry Gauges -->
+      <div class="hidden md:flex items-center gap-4 text-xs font-mono">
+        <div class="bg-white/5 border border-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl min-w-[120px]">
+          <span class="text-slate-400 text-[9px] tracking-wider font-semibold">CPU LOAD</span>
+          <div class="w-full h-1.5 bg-white/5 rounded-full mt-1 overflow-hidden">
+            <div id="cpu-bar" class="h-full bg-cyan-400 transition-all duration-500" style="width: 42%"></div>
+          </div>
+        </div>
+        <div class="bg-white/5 border border-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl min-w-[120px]">
+          <span class="text-slate-400 text-[9px] tracking-wider font-semibold">CORE TEMP</span>
+          <div class="w-full h-1.5 bg-white/5 rounded-full mt-1 overflow-hidden">
+            <div id="temp-bar" class="h-full bg-rose-500 transition-all duration-500" style="width: 58%"></div>
+          </div>
+        </div>
+        <div class="bg-white/5 border border-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl min-w-[100px] flex flex-col justify-center">
+          <div class="text-slate-400 text-[9px] tracking-wider font-semibold">STABILITY</div>
+          <div class="text-cyan-400 font-orbitron font-bold mt-0.5" id="stability-text">99.85%</div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <div class="text-right">
+          <div id="clock" class="font-orbitron font-bold text-cyan-400 tracking-wider">00:00:00 UTC</div>
+          <div id="date" class="text-[10px] text-slate-400 uppercase tracking-widest">06 JUL 2026</div>
+        </div>
+        <button onclick="triggerReboot()" class="px-4 py-2 border border-rose-500/30 text-rose-300 rounded-xl hover:bg-rose-500/15 text-xs font-mono transition-all duration-200 cursor-pointer shadow-[0_0_10px_rgba(244,63,94,0.1)]">
+          <i class="fa-solid fa-power-off"></i> RESET
+        </button>
+      </div>
+    </header>
+
+    <!-- GRID LAYOUT -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <!-- LEFT SIDEBAR: NAV -->
+      <nav class="lg:col-span-3 flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0 font-medium bg-white/[0.03] backdrop-blur-xl border border-white/10 p-3 rounded-2xl shadow-xl">
+        <button onclick="switchTab('dashboard')" id="btn-dashboard" class="tab-btn w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-all cursor-pointer border border-cyan-500/40 text-cyan-400 bg-cyan-500/10 shadow-[0_0_15px_rgba(6,182,212,0.15)] font-semibold">
+          <i class="fa-solid fa-chart-line text-lg w-6 text-center"></i> <span>Dashboard Core</span>
+        </button>
+        <button onclick="switchTab('chat')" id="btn-chat" class="tab-btn w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-all cursor-pointer border border-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-200">
+          <i class="fa-solid fa-robot text-lg w-6 text-center"></i> <span>AI Copilot Chat</span>
+        </button>
+        <button onclick="switchTab('circuit')" id="btn-circuit" class="tab-btn w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-all cursor-pointer border border-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-200">
+          <i class="fa-solid fa-diagram-project text-lg w-6 text-center"></i> <span>Circuit Planner</span>
+        </button>
+        <button onclick="switchTab('code')" id="btn-code" class="tab-btn w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-all cursor-pointer border border-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-200">
+          <i class="fa-solid fa-code text-lg w-6 text-center"></i> <span>Code Generator</span>
+        </button>
+        <button onclick="switchTab('pcb')" id="btn-pcb" class="tab-btn w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-all cursor-pointer border border-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-200">
+          <i class="fa-solid fa-microchip text-lg w-6 text-center"></i> <span>PCB Router Lab</span>
+        </button>
+        <button onclick="switchTab('database')" id="btn-database" class="tab-btn w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-all cursor-pointer border border-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-200">
+          <i class="fa-solid fa-book-atlas text-lg w-6 text-center"></i> <span>Component Wiki</span>
+        </button>
+        <button onclick="switchTab('virtual-lab')" id="btn-virtual-lab" class="tab-btn w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-all cursor-pointer border border-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-200">
+          <i class="fa-solid fa-wave-square text-lg w-6 text-center"></i> <span>Oscilloscope Lab</span>
+        </button>
+        <button onclick="switchTab('trouble')" id="btn-trouble" class="tab-btn w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-all cursor-pointer border border-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-200">
+          <i class="fa-solid fa-stethoscope text-lg w-6 text-center"></i> <span>Diagnostics Core</span>
+        </button>
+      </nav>
+
+      <!-- CENTRAL WORKSPACE -->
+      <main class="lg:col-span-6 flex flex-col gap-6">
+        
+        <!-- DASHBOARD VIEW -->
+        <div id="view-dashboard" class="tab-view space-y-6">
+          <div class="neon-border p-6 relative overflow-hidden">
+            <div class="absolute -right-16 -bottom-16 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <h2 class="text-xl font-bold font-orbitron text-cyan-400 mb-2">SYSTEM MAIN CORE OPERATIONAL</h2>
+            <p class="text-sm text-slate-300 leading-relaxed max-w-lg mb-4">Holographic electronics diagnostic interface calibrated. Switch between workspace modules using the navigation terminal or execute manual diagnostic prompts.</p>
+            <div class="flex flex-wrap gap-2">
+              <span class="bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs px-2.5 py-1 rounded-xl font-mono">AUTOROUTER READY</span>
+              <span class="bg-rose-500/10 border border-rose-500/20 text-pink-400 text-xs px-2.5 py-1 rounded-xl font-mono">VIRTUAL SIM V3.2</span>
+              <span class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs px-2.5 py-1 rounded-xl font-mono">COGNITIVE ENGINE v1.2</span>
+            </div>
+          </div>
+
+          <!-- Quick Action Panels / Mini-Dash widgets -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="neon-border p-5 flex flex-col justify-between h-48">
+              <div>
+                <div class="flex items-center justify-between border-b border-white/5 pb-2">
+                  <h3 class="font-bold text-slate-200">Active Node Matrix</h3>
+                  <i class="fa-solid fa-chart-bar text-cyan-400"></i>
+                </div>
+                <p class="text-xs text-slate-400 mt-2.5">Active simulation instances current workload telemetry status.</p>
+              </div>
+              <div class="space-y-2 font-mono text-xs mt-4 bg-white/[0.02] border border-white/5 p-2 rounded-xl">
+                <div class="flex justify-between"><span>MCU Core Temp</span><span class="text-emerald-400 font-semibold">34°C - STABLE</span></div>
+                <div class="flex justify-between"><span>Active Gates</span><span class="text-cyan-400 font-semibold">12,482 p/s</span></div>
+              </div>
+            </div>
+
+            <div class="neon-border p-5 flex flex-col justify-between h-48">
+              <div>
+                <div class="flex items-center justify-between border-b border-white/5 pb-2">
+                  <h3 class="font-bold text-slate-200">Virtual Lab Telemetry</h3>
+                  <i class="fa-solid fa-microchip text-pink-400"></i>
+                </div>
+                <p class="text-xs text-slate-400 mt-2.5">Ohmic dynamics mapping for active custom load testing.</p>
+              </div>
+              <div class="space-y-2 font-mono text-xs mt-4 bg-white/[0.02] border border-white/5 p-2 rounded-xl">
+                <div class="flex justify-between"><span>Active Voltage</span><span id="dash-v" class="text-pink-400 font-semibold">5.0V</span></div>
+                <div class="flex justify-between"><span>Current Output</span><span id="dash-i" class="text-cyan-400 font-semibold">22.7mA</span></div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Core system activity list -->
+          <div class="neon-border p-5">
+            <h3 class="font-bold font-orbitron text-sm text-cyan-400 mb-3"><i class="fa-solid fa-network-wired"></i> SYSTEM LOGS</h3>
+            <div id="system-event-logs" class="font-mono text-xs text-slate-400 space-y-1.5 max-h-40 overflow-y-auto">
+              <div>[11:37:37] <span class="text-emerald-400">CORE INIT:</span> Holographic pipeline calibrated successfully.</div>
+              <div>[11:37:39] <span class="text-cyan-400">COMPONENT DB:</span> Loaded 12 core integrated packages.</div>
+              <div>[11:37:42] <span class="text-pink-400 font-semibold">OSCILLOSCOPE:</span> Core waveform engine active (60 FPS, SINE).</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI CHAT VIEW -->
+        <div id="view-chat" class="tab-view space-y-4 hidden">
+          <div class="neon-border p-4 flex flex-col h-[500px]">
+            <div class="border-b border-white/10 pb-3 mb-3 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-robot text-cyan-400"></i>
+                <span class="font-bold">VoltMatrix Cognitive Assistant</span>
+              </div>
+              <span class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2.5 py-0.5 rounded-xl font-mono border border-cyan-400/20">MODEL: GEMINI-COGNITIVE-v2</span>
+            </div>
+            
+            <div id="chat-box" class="flex-1 overflow-y-auto space-y-4 p-2 text-sm font-sans">
+              <div class="bg-white/5 p-3.5 rounded-2xl border border-white/10 max-w-[85%] self-start backdrop-blur-md">
+                <p class="text-slate-300 leading-relaxed">Greetings, Operator. I am your integrated AI electronics tutor. Ask me about circuit principles, Arduino/ESP32 coding, PCB design metrics, or core electronic component specifications.</p>
+              </div>
+            </div>
+
+            <!-- Quick Chip Prompts -->
+            <div class="flex flex-wrap gap-1.5 my-3">
+              <button onclick="askPreset('Explain Ohm\'s Law')" class="text-[11px] bg-white/5 border border-white/10 hover:border-cyan-400/50 hover:bg-white/10 text-slate-300 px-2.5 py-1 rounded-xl transition-all cursor-pointer">Ohm's Law</button>
+              <button onclick="askPreset('How does a MOSFET work?')" class="text-[11px] bg-white/5 border border-white/10 hover:border-cyan-400/50 hover:bg-white/10 text-slate-300 px-2.5 py-1 rounded-xl transition-all cursor-pointer">MOSFET Gates</button>
+              <button onclick="askPreset('Explain ESP32 deep sleep')" class="text-[11px] bg-white/5 border border-white/10 hover:border-cyan-400/50 hover:bg-white/10 text-slate-300 px-2.5 py-1 rounded-xl transition-all cursor-pointer">ESP32 Deep Sleep</button>
+            </div>
+
+            <div class="flex gap-2">
+              <input type="text" id="chat-input" placeholder="Type electronics question..." class="flex-1 bg-slate-950/40 border border-white/10 focus:border-cyan-500/50 focus:outline-none rounded-xl px-4 py-2.5 text-sm font-mono text-slate-100">
+              <button onclick="sendChatMessage()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-4 py-2.5 rounded-xl flex items-center justify-center transition-all cursor-pointer shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+                <i class="fa-solid fa-paper-plane"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- CIRCUIT GENERATOR -->
+        <div id="view-circuit" class="tab-view space-y-6 hidden">
+          <div class="neon-border p-5">
+            <h2 class="text-lg font-bold font-orbitron text-cyan-400 mb-2">CIRCUIT DESIGN GENERATOR</h2>
+            <p class="text-xs text-slate-400 mb-4">Input custom functional requirements to map layout connections, voltage rails, and auto-placement schematics.</p>
+            <div class="flex gap-2">
+              <input type="text" id="circuit-prompt" placeholder="e.g. Smart Irrigation System or ESP32 Weather Station" class="flex-1 bg-slate-950/40 border border-white/10 focus:border-cyan-500/50 focus:outline-none rounded-xl px-4 py-2.5 text-sm text-slate-100">
+              <button onclick="generateCircuit()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all cursor-pointer shadow-[0_0_15px_rgba(6,182,212,0.3)]">GENERATE</button>
+            </div>
+            
+            <div class="flex flex-wrap gap-2 mt-4">
+              <button onclick="prefillCircuitPrompt('Smart Irrigation System')" class="text-xs bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 px-3 py-1.5 rounded-xl transition cursor-pointer">Irrigation Sys</button>
+              <button onclick="prefillCircuitPrompt('ESP32 Weather Station')" class="text-xs bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 px-3 py-1.5 rounded-xl transition cursor-pointer">ESP32 Weather</button>
+              <button onclick="prefillCircuitPrompt('Bluetooth Robot')" class="text-xs bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 px-3 py-1.5 rounded-xl transition cursor-pointer">Bluetooth Robot</button>
+            </div>
+          </div>
+
+          <div id="circuit-output-card" class="neon-border p-5 space-y-4 hidden">
+            <div class="flex justify-between border-b border-white/10 pb-2.5">
+              <h3 id="circuit-title" class="font-bold text-cyan-400">Generated Architecture</h3>
+              <span class="text-xs text-slate-400 font-mono">STATUS: DESIGN CONFIRMED</span>
+            </div>
+
+            <!-- INTERACTIVE DIAGRAM -->
+            <div class="bg-slate-950/40 p-4 rounded-xl flex items-center justify-center relative border border-white/10 h-64 overflow-hidden">
+              <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(4,8,20,0.8)_100%)]"></div>
+              <div id="schematic-canvas" class="w-full h-full flex items-center justify-center"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+              <div class="bg-white/5 p-3.5 rounded-xl border border-white/10">
+                <span class="text-cyan-400 font-bold block mb-1.5">COMPONENTS LIST</span>
+                <ul id="circuit-components" class="space-y-1 list-disc pl-4 text-slate-300"></ul>
+              </div>
+              <div class="bg-white/5 p-3.5 rounded-xl border border-white/10">
+                <span class="text-pink-400 font-bold block mb-1.5">POWER PROFILE</span>
+                <div id="circuit-power" class="space-y-1 text-slate-300 font-mono"></div>
+              </div>
+            </div>
+             <div class="bg-white/5 p-3.5 rounded-xl border border-white/10 text-xs">
+              <span class="text-amber-400 font-bold block mb-1.5">PIN CONNECTIVITY MATRIX</span>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left font-mono">
+                  <thead>
+                    <tr class="border-b border-white/10 text-slate-400"><th class="pb-1.5">From Component</th><th class="pb-1.5">From Pin</th><th class="pb-1.5">To Component</th><th class="pb-1.5">To Pin</th></tr>
+                  </thead>
+                  <tbody id="circuit-pins" class="divide-y divide-white/5 text-slate-300"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CODE GENERATOR -->
+        <div id="view-code" class="tab-view space-y-4 hidden">
+          <div class="neon-border p-4 flex flex-col h-[520px]">
+            <div class="flex items-center justify-between border-b border-white/10 pb-3 mb-3">
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-code text-pink-400"></i>
+                <span class="font-bold">Firmware Synthesizer</span>
+              </div>
+              <div class="flex gap-2">
+                <button onclick="setCodeLang('arduino')" id="btn-lang-arduino" class="text-xs bg-cyan-500/10 text-cyan-400 border border-cyan-400/25 px-2.5 py-1 rounded-xl">Arduino C++</button>
+                <button onclick="setCodeLang('python')" id="btn-lang-python" class="text-xs bg-white/5 text-slate-400 border border-white/10 px-2.5 py-1 rounded-xl hover:bg-white/10 hover:text-slate-200">MicroPython</button>
+              </div>
+            </div>
+
+            <div class="flex-1 relative bg-slate-950/40 rounded-xl p-4 font-mono text-xs overflow-auto border border-white/10">
+              <button onclick="copyCode()" class="absolute top-3 right-3 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-cyan-400 p-2 rounded-xl border border-white/10 transition cursor-pointer">
+                <i class="fa-regular fa-copy"></i> Copy
+              </button>
+              <pre class="text-emerald-400"><code id="code-block">/* Select/Generate a circuit from the Circuit Planner to view code */</code></pre>
+            </div>
+
+            <div class="bg-white/5 p-3.5 rounded-xl border border-white/10 text-xs mt-3">
+              <span class="text-amber-400 font-bold block mb-1">COMPILE & TESTING MATRIX</span>
+              <ul class="list-disc pl-4 text-slate-400 space-y-1" id="code-explanation">
+                <li>Choose a predefined project in the Circuit Planner to auto-generate corresponding testing scripts.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- PCB ROUTER LAB -->
+        <div id="view-pcb" class="tab-view space-y-6 hidden">
+          <div class="neon-border p-5">
+            <h2 class="text-lg font-bold font-orbitron text-cyan-400 mb-1">AUTO-ROUTING SIMULATOR</h2>
+            <p class="text-xs text-slate-400 mb-4">Run active maze-connection auto-routing loops mapping trace geometry and layer placement grids.</p>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs mb-4">
+              <div class="bg-white/5 p-2.5 rounded-xl border border-white/10">
+                <label class="text-slate-400 block mb-1 text-[9px] uppercase font-bold tracking-wider">LAYER PROFILE</label>
+                <select id="pcb-layers" class="bg-slate-950/50 text-slate-300 w-full focus:outline-none p-1 border border-white/10 rounded-lg">
+                  <option value="2">2 Layers (FR-4)</option>
+                  <option value="4">4 Layers (FR-4 High)</option>
+                </select>
+              </div>
+              <div class="bg-white/5 p-2.5 rounded-xl border border-white/10">
+                <label class="text-slate-400 block mb-1 text-[9px] uppercase font-bold tracking-wider">TRACE WIDTH</label>
+                <select id="pcb-trace" class="bg-slate-950/50 text-slate-300 w-full focus:outline-none p-1 border border-white/10 rounded-lg">
+                  <option value="0.25">0.25 mm (Signal)</option>
+                  <option value="0.5">0.50 mm (Medium)</option>
+                  <option value="1.0">1.00 mm (Power)</option>
+                </select>
+              </div>
+              <div class="bg-white/5 p-2.5 rounded-xl border border-white/10 flex flex-col justify-center">
+                <div class="text-slate-400 block mb-0.5 text-[9px] uppercase font-bold tracking-wider">COMPLETION</div>
+                <div id="pcb-pct" class="font-bold text-pink-400 font-orbitron text-sm">0.0%</div>
+              </div>
+              <button onclick="startAutoRoute()" id="pcb-start-btn" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-xl py-2 cursor-pointer text-xs self-end h-11 transition shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+                START AUTO-ROUTE
+              </button>
+            </div>
+
+            <!-- PCB Canvas Grid -->
+            <div class="bg-slate-950/40 p-3 rounded-2xl border border-white/10 flex items-center justify-center relative">
+              <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(4,8,20,0.8)_100%)] z-10"></div>
+              <canvas id="pcb-canvas" width="480" height="300" class="max-w-full bg-slate-950/60 rounded-xl border border-white/10 relative z-0"></canvas>
+            </div>
+
+            <div class="bg-white/5 p-3.5 rounded-xl border border-white/10 font-mono text-xs max-h-32 overflow-y-auto space-y-1 mt-4 text-slate-400" id="pcb-logs">
+              <div>[OS] System standby. Press START AUTO-ROUTE to map pin geometry.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- COMPONENT WIKI -->
+        <div id="view-database" class="tab-view space-y-6 hidden">
+          <div class="neon-border p-5">
+            <h2 class="text-lg font-bold font-orbitron text-cyan-400 mb-2">ELECTRONICS ENCYCLOPEDIA</h2>
+            <div class="flex gap-2">
+              <input type="text" id="wiki-search" oninput="filterWiki()" placeholder="Search components..." class="flex-1 bg-slate-950/40 border border-white/10 focus:border-cyan-500/50 focus:outline-none rounded-xl px-4 py-2.5 text-sm text-slate-100">
+            </div>
+          </div>
+
+          <div id="wiki-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+
+        <!-- OSCILLOSCOPE LAB / VIRTUAL LAB -->
+        <div id="view-virtual-lab" class="tab-view space-y-6 hidden">
+          <div class="neon-border p-5 space-y-5">
+            <h2 class="text-lg font-bold font-orbitron text-cyan-400">ACTIVE CIRCUITS LAB</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <!-- Voltage / Resistance Sliders -->
+              <div class="space-y-4 bg-white/5 p-4.5 rounded-2xl border border-white/10">
+                <div>
+                  <div class="flex justify-between text-xs font-mono mb-2">
+                    <span class="text-slate-400 font-semibold uppercase tracking-wider">VOLTAGE INPUT</span>
+                    <span class="text-cyan-400 font-bold" id="lab-v-val">5.0 V</span>
+                  </div>
+                  <input type="range" id="lab-v-slider" min="0" max="24" step="0.1" value="5.0" oninput="updateLabParams()" class="w-full accent-cyan-400 cursor-pointer">
+                </div>
+
+                <div>
+                  <div class="flex justify-between text-xs font-mono mb-2">
+                    <span class="text-slate-400 font-semibold uppercase tracking-wider">LOAD RESISTANCE</span>
+                    <span class="text-pink-400 font-bold" id="lab-r-val">220 Ω</span>
+                  </div>
+                  <input type="range" id="lab-r-slider" min="10" max="2000" step="5" value="220" oninput="updateLabParams()" class="w-full accent-pink-400 cursor-pointer">
+                </div>
+              </div>
+
+              <!-- Digital Multi-meter Output -->
+              <div class="bg-white/5 p-4.5 rounded-2xl border border-white/10 flex flex-col justify-between">
+                <div class="flex justify-between text-xs text-slate-400 border-b border-white/10 pb-2 font-mono">
+                  <span class="font-semibold uppercase tracking-wider">MULTIMETER DIAGNOSTICS</span>
+                  <span class="text-emerald-400 font-semibold">CALIBRATED</span>
+                </div>
+                <div class="grid grid-cols-2 gap-4 text-center py-2">
+                  <div>
+                    <div class="text-[9px] text-slate-400 tracking-wider font-semibold uppercase">CALCULATED CURRENT</div>
+                    <div id="meter-i" class="text-2xl font-bold font-orbitron text-cyan-400 tracking-wide mt-1">22.73 mA</div>
+                  </div>
+                  <div>
+                    <div class="text-[9px] text-slate-400 tracking-wider font-semibold uppercase">POWER DISSIPATION</div>
+                    <div id="meter-p" class="text-2xl font-bold font-orbitron text-pink-400 tracking-wide mt-1">113.6 mW</div>
+                  </div>
+                </div>
+                <p class="text-[10px] text-slate-400 text-center font-mono border-t border-white/5 pt-2">Ohm's Law Engine: Current I = V / R. Power P = V * I.</p>
+              </div>
+            </div>
+
+            <!-- Flowing Electrons Canvas -->
+            <div class="bg-slate-950/40 p-4 rounded-2xl border border-white/10 flex flex-col items-center">
+              <span class="text-xs text-slate-300 self-start mb-2.5 font-mono flex items-center gap-2"><i class="fa-solid fa-bolt text-cyan-400 animate-pulse"></i> CHARGE ELECTRON DYNAMICS</span>
+              <canvas id="circuit-wire-canvas" width="480" height="100" class="max-w-full bg-slate-950/60 rounded-xl border border-white/10"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- DIAGNOSTICS CORE -->
+        <div id="view-trouble" class="tab-view space-y-6 hidden">
+          <div class="neon-border p-5">
+            <h2 class="text-lg font-bold font-orbitron text-cyan-400 mb-2">INTELLIGENT TROUBLESHOOTING CORE</h2>
+            <p class="text-xs text-slate-400 mb-4">Input symptom characteristics or choose standard diagnostic anomalies to launch scanning sequences.</p>
+            
+            <div class="space-y-4">
+              <div>
+                <label class="text-xs text-slate-400 block mb-1.5 font-semibold uppercase tracking-wider">SELECT SYMPTOM CHARACTERISTICS</label>
+                <select id="trouble-select" class="w-full bg-slate-950/40 border border-white/10 text-slate-200 text-sm p-3 rounded-xl focus:outline-none focus:border-cyan-500/50">
+                  <option value="led-off">My LED indicator is not glowing at all</option>
+                  <option value="esp32-reset">ESP32 keeps restarting and resetting continuously</option>
+                  <option value="short">Short circuit suspected - Voltage rails dropping</option>
+                  <option value="noise">Signal noise and fluctuating sensor telemetry</option>
+                </select>
+              </div>
+              <button onclick="runDiagnostics()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2.5 rounded-xl text-sm transition font-orbitron cursor-pointer shadow-[0_0_15px_rgba(6,182,212,0.3)] tracking-wider">LAUNCH DIAGNOSTIC DEEP SCAN</button>
+            </div>
+          </div>
+
+          <div id="trouble-output-card" class="neon-border p-5 space-y-4 hidden">
+            <div class="flex justify-between border-b border-white/10 pb-2.5">
+              <h3 class="font-bold text-cyan-400" id="trouble-anomaly">Diagnostic Output Anomaly</h3>
+              <span class="text-xs text-slate-400 font-mono">CODE: DETECTED_0x401</span>
+            </div>
+
+            <!-- Diagnostics Progress Meter -->
+            <div id="diag-scanner" class="space-y-2 hidden">
+              <div class="flex justify-between text-xs font-mono"><span class="text-cyan-400">ANALYZING SIGNAL DEVIATION...</span><span id="diag-pct" class="text-cyan-400">0%</span></div>
+              <div class="w-full h-2.5 bg-slate-950/50 rounded-full overflow-hidden border border-white/10">
+                <div id="diag-bar" class="h-full bg-cyan-400" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <div id="diag-results" class="space-y-4 text-xs">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-white/5 p-3.5 rounded-xl border border-white/10">
+                  <span class="text-rose-400 font-bold block mb-1.5"><i class="fa-solid fa-triangle-exclamation"></i> POSSIBLE CAUSES</span>
+                  <ul id="trouble-causes" class="space-y-1 list-disc pl-4 text-slate-300"></ul>
+                </div>
+                <div class="bg-white/5 p-3.5 rounded-xl border border-white/10">
+                  <span class="text-emerald-400 font-bold block mb-1.5"><i class="fa-solid fa-check"></i> CORRECTIVE ACTIONS</span>
+                  <ul id="trouble-actions" class="space-y-1 list-disc pl-4 text-slate-300"></ul>
+                </div>
+              </div>
+
+              <div class="bg-white/5 p-3.5 rounded-xl border border-white/10">
+                <span class="text-amber-400 font-bold block mb-1.5"><i class="fa-solid fa-shield-halved"></i> LAB SAFETY PRECAUTIONS</span>
+                <p id="trouble-safety" class="text-slate-300 leading-relaxed"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- RIGHT SIDEBAR: OSCILLOSCOPE HUD -->
+      <aside class="lg:col-span-3 space-y-6">
+        
+        <!-- Live Waveform Monitor -->
+        <div class="neon-border p-5">
+          <div class="flex items-center justify-between border-b border-white/10 pb-2.5 mb-3">
+            <span class="font-bold text-xs font-orbitron tracking-wider text-cyan-400">OSCILLOSCOPE FEED</span>
+            <span class="relative flex h-2.5 w-2.5">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
+          </div>
+
+          <div class="bg-slate-950/50 rounded-xl border border-white/10 relative p-1 mb-4">
+            <canvas id="scope-canvas" width="280" height="150" class="w-full bg-slate-950/30 rounded-lg"></canvas>
+          </div>
+
+          <div class="space-y-3 text-xs">
+            <div>
+              <div class="flex justify-between text-[11px] text-slate-400 mb-1.5 font-mono">
+                <span>SIGNAL TYPE</span>
+                <span class="text-cyan-400 font-bold" id="scope-type-text">SINE</span>
+              </div>
+              <div class="grid grid-cols-4 gap-1">
+                <button onclick="setWave('sine')" class="bg-cyan-500/10 text-cyan-400 p-1.5 border border-cyan-400/20 rounded-lg text-[9px] hover:bg-cyan-500/20 transition cursor-pointer font-bold">SINE</button>
+                <button onclick="setWave('square')" class="bg-white/5 text-slate-400 p-1.5 border border-white/5 rounded-lg text-[9px] hover:bg-white/10 hover:text-slate-200 transition cursor-pointer font-bold">SQR</button>
+                <button onclick="setWave('tri')" class="bg-white/5 text-slate-400 p-1.5 border border-white/5 rounded-lg text-[9px] hover:bg-white/10 hover:text-slate-200 transition cursor-pointer font-bold">TRI</button>
+                <button onclick="setWave('noise')" class="bg-white/5 text-slate-400 p-1.5 border border-white/5 rounded-lg text-[9px] hover:bg-white/10 hover:text-slate-200 transition cursor-pointer font-bold">NOISE</button>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-[11px] text-slate-400 mb-0.5 font-mono">
+                <span>FREQUENCY</span>
+                <span class="text-pink-400 font-bold" id="scope-f-text">40 Hz</span>
+              </div>
+              <input type="range" id="scope-freq" min="5" max="100" value="40" oninput="updateWaveParams()" class="w-full accent-pink-400 cursor-pointer">
+            </div>
+
+            <div>
+              <div class="flex justify-between text-[11px] text-slate-400 mb-0.5 font-mono">
+                <span>AMPLITUDE</span>
+                <span class="text-cyan-400 font-bold" id="scope-a-text">25 V</span>
+              </div>
+              <input type="range" id="scope-amp" min="5" max="60" value="25" oninput="updateWaveParams()" class="w-full accent-cyan-400 cursor-pointer">
+            </div>
+          </div>
+        </div>
+
+        <!-- System Telemetry metrics -->
+        <div class="neon-border p-5 space-y-4 text-xs font-mono">
+          <div class="border-b border-white/10 pb-2.5 flex items-center justify-between">
+            <span class="font-bold text-slate-200 flex items-center gap-2"><i class="fa-solid fa-gauge-high text-cyan-400"></i> CORE TELEMETRY</span>
+            <span class="text-slate-500 text-[10px] uppercase font-bold tracking-wider">REALTIME</span>
+          </div>
+          
+          <div class="space-y-2 bg-white/[0.02] border border-white/5 p-3.5 rounded-xl">
+            <div class="flex justify-between">
+              <span class="text-slate-400">VOLTAGE RAIL</span>
+              <span class="text-cyan-400 font-bold" id="tele-v">5.00 V</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">CURRENT RAIL</span>
+              <span class="text-pink-400 font-bold" id="tele-i">22.73 mA</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">COMPLEX LOAD</span>
+              <span class="text-amber-400 font-semibold" id="tele-r">220.0 Ω</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">POWER DRAW</span>
+              <span class="text-emerald-400 font-bold" id="tele-p">113.64 mW</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+
+  <script>
+    // CORE GLOBAL VARIABLES
+    let currentTab = 'dashboard';
+    let codeLanguage = 'arduino';
+    let currentSelectedCircuit = null;
+
+    // Multimeter virtual parameters
+    let labVoltage = 5.0;
+    let labResistance = 220;
+
+    // Component database dictionary
+    const WIKI_DATA = [
+      {
+        id: 'resistor',
+        name: 'Resistor',
+        desc: 'Restricts and regulates the flow of electrical current in a circuit.',
+        pinout: 'Non-polarized, bidirectional (Pin 1, Pin 2).',
+        apps: 'Current limiting for LEDs, voltage dividers, pull-up/pull-down lines.',
+        pros: 'Highly reliable, cheap, essential for voltage control.',
+        cons: 'Dissipates excess electrical energy entirely as heat energy.',
+        v: 5.0, r: 220
+      },
+      {
+        id: 'capacitor',
+        name: 'Capacitor',
+        desc: 'Stores electrical charge temporarily in an electrostatic field.',
+        pinout: 'Polarized (Anode: long leg [+], Cathode: short leg with stripe [-]).',
+        apps: 'Power supply decoupling, signal filtering, smoothing AC-DC ripples.',
+        pros: 'Acts as local power buffer, suppresses voltage transients.',
+        cons: 'Can burst if reverse polarity or over-voltage is applied.',
+        v: 5.0, r: 1000
+      },
+      {
+        id: 'led',
+        name: 'LED (Light Emitting Diode)',
+        desc: 'Semiconductor junction that emits light when forward biased.',
+        pinout: 'Anode (long lead [+]), Cathode (short lead [-], flat edge on package).',
+        apps: 'Visual indicator signals, optical communication, display panels.',
+        pros: 'Extremely efficient, high speed response, long service lifespan.',
+        cons: 'Instantly burns out if driven without current-limiting resistors.',
+        v: 3.3, r: 220
+      },
+      {
+        id: 'mosfet',
+        name: 'MOSFET (N-Channel)',
+        desc: 'Voltage-controlled switch for managing high current loads.',
+        pinout: 'Pin 1: Gate (G), Pin 2: Drain (D), Pin 3: Source (S).',
+        apps: 'Motor driving controllers, solenoid switching, buck converters.',
+        pros: 'Low on-resistance, fast switching speeds, high current limits.',
+        cons: 'Gate oxide layer is highly sensitive to electrostatic damage.',
+        v: 12.0, r: 47
+      },
+      {
+        id: 'arduino',
+        name: 'Arduino Uno MCU',
+        desc: '8-bit microcontroller board utilizing the ATmega328P processor.',
+        pinout: '14 Digital IOs (6 PWM outputs), 6 Analog Inputs, 5V, 3.3V, GND.',
+        apps: 'Robotics, sensor interfacing, fast DIY hardware prototyping.',
+        pros: 'Massive library environment, standard layout, robust build.',
+        cons: 'Very limited memory (2KB RAM) and low clock speed (16MHz).',
+        v: 5.0, r: 330
+      },
+      {
+        id: 'esp32',
+        name: 'ESP32 Dual-Core',
+        desc: '32-bit SoC featuring integrated Wi-Fi, Bluetooth, and rich GPIOs.',
+        pinout: '36 GPIO pins with ADC/DAC, capacitive touch, SPI, I2C, UART.',
+        apps: 'IoT appliances, wireless sensors, cloud telemetry hubs.',
+        pros: 'Extremely fast dual cores (240MHz), low cost, wireless on-board.',
+        cons: 'High transient current draw when Wi-Fi transmitters activate.',
+        v: 3.3, r: 100
+      }
+    ];
+
+    // Predefined Circuit suggestions responses
+    const CIRCUITS_DATA = {
+      'Smart Irrigation System': {
+        title: "Smart Irrigation System",
+        components: ["ESP32 Microcontroller", "Soil Moisture Sensor (Analog)", "5V DC Relay Module", "12V Water Pump", "1N4007 Flyback Diode"],
+        power: ["Logic Power: 3.3V (200mA)", "Pump Power: 12V (800mA)", "Quiescent current: ~65mA"],
+        connections: [
+          { from: "Soil Sensor", fPin: "VCC", to: "ESP32", tPin: "3V3" },
+          { from: "Soil Sensor", fPin: "A0", to: "ESP32", tPin: "GPIO34" },
+          { from: "ESP32", fPin: "GPIO23", to: "Relay Pin", tPin: "IN" },
+          { from: "Relay Out", fPin: "NO", to: "Water Pump", tPin: "+12V" }
+        ],
+        code: {
+          arduino: `// Smart Irrigation System - ESP32 Firmware
+#define SOIL_PIN 34
+#define RELAY_PIN 23
+const int DRY_THRESHOLD = 2500; // ADC threshold
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(RELAY_PIN, OUTPUT);
+  digitalWrite(RELAY_PIN, LOW); // Keep pump off
+}
+
+void loop() {
+  int moisture = analogRead(SOIL_PIN);
+  Serial.print("Soil Moisture Level: ");
+  Serial.println(moisture);
+  
+  if (moisture > DRY_THRESHOLD) {
+    Serial.println("Soil is dry! Triggering water pump...");
+    digitalWrite(RELAY_PIN, HIGH); // Pump on
+  } else {
+    Serial.println("Soil is wet. Turning pump off.");
+    digitalWrite(RELAY_PIN, LOW); // Pump off
+  }
+  delay(5000); // Check every 5s
+}`,
+          python: `# Smart Irrigation System - ESP32 MicroPython
+from machine import Pin, ADC
+import time
+
+soil = ADC(Pin(34))
+soil.atten(ADC.ATTN_11DB) # 0-3.6V range
+relay = Pin(23, Pin.OUT)
+
+while True:
+    val = soil.read()
+    print("Soil Moisture:", val)
+    if val > 2500:
+        print("Dry! Activating water pump...")
+        relay.value(1)
+    else:
+        print("Moist. Shutting pump down.")
+        relay.value(0)
+    time.sleep(5)`
+        },
+        schema: [
+          { type: 'mcu', name: 'ESP32', x: 80, y: 50 },
+          { type: 'sensor', name: 'Moisture', x: 300, y: 50 },
+          { type: 'actuator', name: 'Relay', x: 200, y: 150 }
+        ]
+      },
+      'ESP32 Weather Station': {
+        title: "ESP32 Weather Station",
+        components: ["ESP32 DevKit Module", "BME280 Temp/Humidity/Pressure", "I2C 128x64 OLED Display", "Pull-up Resistors (4.7kΩ)"],
+        power: ["Operational voltage: 3.3V Rail", "Average draw: ~120mA (with OLED Active)"],
+        connections: [
+          { from: "BME280", fPin: "VCC", to: "ESP32", tPin: "3V3" },
+          { from: "BME280", fPin: "SDA", to: "ESP32", tPin: "GPIO21" },
+          { from: "OLED", fPin: "SDA", to: "ESP32", tPin: "GPIO21" },
+          { from: "OLED", fPin: "SCL", to: "ESP32", tPin: "GPIO22" }
+        ],
+        code: {
+          arduino: `// ESP32 Weather Station Firmware
+#include <Wire.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BME280.h>
+#include <Adafruit_SSD1306.h>
+
+Adafruit_BME280 bme;
+Adafruit_SSD1306 display(128, 64, &Wire, -1);
+
+void setup() {
+  Serial.begin(115200);
+  Wire.begin(21, 22); // SDA, SCL
+  
+  if(!bme.begin(0x76)) {
+    Serial.println("Could not find BME280 sensor!");
+  }
+  if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+    Serial.println("OLED allocation failed!");
+  }
+  display.clearDisplay();
+}
+
+void loop() {
+  float temp = bme.readTemperature();
+  float hum = bme.readHumidity();
+  
+  display.clearDisplay();
+  display.setTextColor(WHITE);
+  display.setCursor(0,0);
+  display.println("WEATHER TELEMETRY");
+  display.print("Temp: "); display.print(temp); display.println(" C");
+  display.print("Hum:  "); display.print(hum); display.println(" %");
+  display.display();
+  delay(2000);
+}`,
+          python: `# ESP32 Weather Station - MicroPython
+from machine import Pin, I2C
+import bme280, ssd1306, time
+
+i2c = I2C(0, scl=Pin(22), sda=Pin(21))
+bme = bme280.BME280(i2c=i2c)
+oled = ssd1306.SSD1306_I2C(128, 64, i2c)
+
+while True:
+    t, p, h = bme.read_compensated_data()
+    oled.fill(0)
+    oled.text("WEATHER STATION", 0, 0)
+    oled.text("Temp: {:.1f} C".format(t/100), 0, 20)
+    oled.text("Hum:  {:.1f} %".format(h/1024), 0, 40)
+    oled.show()
+    time.sleep(2)`
+        },
+        schema: [
+          { type: 'mcu', name: 'ESP32', x: 80, y: 50 },
+          { type: 'sensor', name: 'BME280', x: 300, y: 50 },
+          { type: 'actuator', name: 'OLED', x: 200, y: 150 }
+        ]
+      },
+      'Bluetooth Robot': {
+        title: "Arduino Bluetooth Smart Robot",
+        components: ["Arduino Uno Microcontroller", "HC-05 Bluetooth Module", "L298N Dual H-Bridge Driver", "2x DC Gear Motors", "7.4V Li-ion Battery"],
+        power: ["Motor Power: 7.4V directly from battery", "Logic Power: 5V regulated from L298N to Uno"],
+        connections: [
+          { from: "HC-05 BT", fPin: "TX", to: "Arduino Uno", tPin: "RX (Pin 0)" },
+          { from: "HC-05 BT", fPin: "RX", to: "Arduino Uno", tPin: "TX (Pin 1)" },
+          { from: "L298N H-Bridge", fPin: "IN1", to: "Arduino Uno", tPin: "Pin 5" },
+          { from: "L298N H-Bridge", fPin: "OUT1", to: "DC Motor A", tPin: "Terminals" }
+        ],
+        code: {
+          arduino: `// Bluetooth Robot - Arduino Uno Controller
+#include <SoftwareSerial.h>
+SoftwareSerial BTSerial(10, 11); // RX, TX
+
+// L298N Motor control pins
+#define IN1 5
+#define IN2 6
+
+void setup() {
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  BTSerial.begin(9600);
+}
+
+void loop() {
+  if (BTSerial.available()) {
+    char cmd = BTSerial.read();
+    if(cmd == 'F') { // Forward
+      digitalWrite(IN1, HIGH);
+      digitalWrite(IN2, LOW);
+    } else if(cmd == 'S') { // Stop
+      digitalWrite(IN1, LOW);
+      digitalWrite(IN2, LOW);
+    }
+  }
+}`,
+          python: `# Bluetooth Robot - MicroPython for ESP32
+from machine import Pin, UART
+import time
+
+uart = UART(2, baudrate=9600, tx=17, rx=16)
+m1 = Pin(5, Pin.OUT)
+m2 = Pin(6, Pin.OUT)
+
+while True:
+    if uart.any():
+        cmd = uart.read(1)
+        if cmd == b'F':
+            m1.value(1)
+            m2.value(0)
+        elif cmd == b'S':
+            m1.value(0)
+            m2.value(0)
+    time.sleep(0.05)`
+        },
+        schema: [
+          { type: 'mcu', name: 'Arduino Uno', x: 80, y: 50 },
+          { type: 'sensor', name: 'HC-05 BT', x: 300, y: 50 },
+          { type: 'actuator', name: 'L298N Driver', x: 200, y: 150 }
+        ]
+      }
+    };
+
+    // Chatbot intelligence keywords database
+    const CHAT_RESPONSES = {
+      'ohm': `<strong>Ohm's Law Explanation:</strong><br>
+              Ohm's Law defines the relationship between Voltage (V), Current (I), and Resistance (R):<br>
+              <code class="text-pink-400 font-mono">V = I * R</code><br>
+              <ul>
+                <li><strong>Voltage (V):</strong> Electric pressure (Volts)</li>
+                <li><strong>Current (I):</strong> Flow of electrons (Amperes)</li>
+                <li><strong>Resistance (R):</strong> Impedance to current (Ohms)</li>
+              </ul>
+              To calculate current: <code>I = V / R</code>. Test this relationship live in the <strong>Oscilloscope Lab</strong> tab!`,
+      'mosfet': `<strong>MOSFET Gate Principles:</strong><br>
+                 A Metal-Oxide-Semiconductor Field-Effect Transistor (MOSFET) acts as a high-speed electronic switch:<br>
+                 <ul>
+                   <li><strong>Gate (G):</strong> Voltage control terminal. In N-channel MOSFETs, high gate voltage opens the channel.</li>
+                   <li><strong>Drain (D):</strong> Output where load connects.</li>
+                   <li><strong>Source (S):</strong> Connected to Ground.</li>
+                 </ul>
+                 Typical Part: <strong>IRF540N</strong>. Always include a 10k pull-down resistor from Gate to Source to prevent false triggering from environmental static charge.`,
+      'esp32': `<strong>ESP32 Microcontroller Core Capabilities:</strong><br>
+                The ESP32 is a highly integrated module featuring dual 32-bit Xtensa cores at up to 240MHz.<br>
+                <ul>
+                  <li><strong>Deep Sleep:</strong> Power consumption drops to only 10µA while retaining RTC timer loops.</li>
+                  <li><strong>I/O:</strong> High speed ADC converters, DAC, native capacitive touch sensors.</li>
+                  <li><strong>Wireless:</strong> Built-in 2.4GHz Wi-Fi and Bluetooth LE transceiver modules.</li>
+                </ul>
+                Ideal for Internet of Things (IoT) nodes, home automation, and live telemetry devices.`,
+      'arduino': `<strong>Arduino Uno Board Metrics:</strong><br>
+                  The industry standard for entry-level prototyping, based on the 8-bit ATmega328P MCU.<br>
+                  <ul>
+                    <li>Runs at 16MHz with 32KB Flash and 2KB SRAM.</li>
+                    <li>Highly resilient: GPIO pins can source/sink up to 40mA.</li>
+                    <li>Excellent starting platform for learning motor driving, basic switches, and simple digital protocols.</li>
+                  </ul>`
+    };
+
+    // STARTUP ROUTINES
+    window.onload = function() {
+      initBackgroundCanvas();
+      initOscilloscopeCanvas();
+      initWireCanvas();
+      initPcbCanvas();
+      renderWikiGrid();
+      
+      // Update real clocks
+      setInterval(updateClocks, 1000);
+      updateClocks();
+      
+      // Keep metrics shifting slightly
+      setInterval(simulateFluctuations, 2000);
+    };
+
+    // TAB MANAGEMENT
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-view').forEach(view => view.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('border-cyan-500/40', 'text-cyan-400', 'bg-cyan-500/10', 'shadow-[0_0_15px_rgba(6,182,212,0.15)]', 'font-semibold');
+        btn.classList.add('border-white/5', 'text-slate-400');
+        btn.classList.remove('hover:bg-white/10', 'hover:text-slate-200');
+      });
+
+      const targetView = document.getElementById(`view-${tabId}`);
+      if (targetView) targetView.classList.remove('hidden');
+
+      const targetBtn = document.getElementById(`btn-${tabId}`);
+      if (targetBtn) {
+        targetBtn.classList.remove('border-white/5', 'text-slate-400');
+        targetBtn.classList.add('border-cyan-500/40', 'text-cyan-400', 'bg-cyan-500/10', 'shadow-[0_0_15px_rgba(6,182,212,0.15)]', 'font-semibold');
+      }
+      currentTab = tabId;
+      addSystemLog(`Tab switch: navigated to ${tabId.toUpperCase()} workspace.`);
+    }
+
+    // CLOCKS & FLOATING TELEMETRY
+    function updateClocks() {
+      const now = new Date();
+      document.getElementById('clock').innerText = now.toISOString().slice(11, 19) + ' UTC';
+      document.getElementById('date').innerText = now.toUTCString().slice(5, 16).toUpperCase();
+    }
+
+    function simulateFluctuations() {
+      const cpu = Math.floor(35 + Math.random() * 20);
+      const temp = Math.floor(45 + Math.random() * 15);
+      const stab = (99.8 + Math.random() * 0.15).toFixed(3) + '%';
+      
+      document.getElementById('cpu-bar').style.width = cpu + '%';
+      document.getElementById('temp-bar').style.width = temp + '%';
+      document.getElementById('stability-text').innerText = stab;
+    }
+
+    function addSystemLog(msg) {
+      const logger = document.getElementById('system-event-logs');
+      const timeStr = new Date().toISOString().slice(11, 19);
+      const newDiv = document.createElement('div');
+      newDiv.innerHTML = `[${timeStr}] <span class="text-cyan-400">${msg}</span>`;
+      logger.appendChild(newDiv);
+      logger.scrollTop = logger.scrollHeight;
+    }
+
+    // BACKGROUND NODES CANVAS
+    let bgCtx, bgWidth, bgHeight, nodes = [];
+    function initBackgroundCanvas() {
+      const canvas = document.getElementById('bg-canvas');
+      bgCtx = canvas.getContext('2d');
+      bgWidth = canvas.width = window.innerWidth;
+      bgHeight = canvas.height = window.innerHeight;
+      
+      for(let i=0; i<30; i++) {
+        nodes.push({
+          x: Math.random() * bgWidth,
+          y: Math.random() * bgHeight,
+          vx: (Math.random() - 0.5) * 0.6,
+          vy: (Math.random() - 0.5) * 0.6,
+          radius: Math.random() * 2.5 + 1
+        });
+      }
+      requestAnimationFrame(drawBackgroundParticles);
+    }
+    
+    function drawBackgroundParticles() {
+      bgCtx.clearRect(0, 0, bgWidth, bgHeight);
+      bgCtx.fillStyle = 'rgba(0, 240, 255, 0.4)';
+      bgCtx.strokeStyle = 'rgba(0, 240, 255, 0.08)';
+      
+      nodes.forEach((n, idx) => {
+        n.x += n.vx;
+        n.y += n.vy;
+        if(n.x < 0 || n.x > bgWidth) n.vx *= -1;
+        if(n.y < 0 || n.y > bgHeight) n.vy *= -1;
+        
+        bgCtx.beginPath();
+        bgCtx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
+        bgCtx.fill();
+        
+        for(let j=idx+1; j<nodes.length; j++) {
+          const o = nodes[j];
+          const dist = Math.hypot(n.x - o.x, n.y - o.y);
+          if(dist < 180) {
+            bgCtx.beginPath();
+            bgCtx.moveTo(n.x, n.y);
+            bgCtx.lineTo(o.x, o.y);
+            bgCtx.stroke();
+          }
+        }
+      });
+      requestAnimationFrame(drawBackgroundParticles);
+    }
+
+    // SYSTEM RESET REBOOT ANIMATION
+    function triggerReboot() {
+      const screen = document.getElementById('reboot-screen');
+      const logger = document.getElementById('reboot-log');
+      screen.classList.remove('hidden');
+      screen.classList.add('flex');
+      logger.innerHTML = '';
+      
+      const commands = [
+        "TERMINATING SECURE CORES...",
+        "DISCHARGING VOLTAGE CAPACITANCE RAILS... [OK]",
+        "FLUSHING INTERACTIVE OSCILLOSCOPE BUFFERS... [OK]",
+        "CALIBRATING GROUND POTENTIALS... [OK]",
+        "RECONNECTING AI COGNITIVE NETWORK BRIDGE...",
+        "PARSING ENCYCLOPEDIA PACKAGES...",
+        "STABILIZING SYSTEM BUS FREQUENCY: 2.40GHz [OK]",
+        "VOLTMATRIX OPERATING SYSTEM STABLE. SECURE CORE STANDBY."
+      ];
+      
+      let step = 0;
+      function runStep() {
+        if(step < commands.length) {
+          const div = document.createElement('div');
+          div.innerText = ">> " + commands[step];
+          logger.appendChild(div);
+          logger.scrollTop = logger.scrollHeight;
+          step++;
+          setTimeout(runStep, 400);
+        } else {
+          setTimeout(() => {
+            screen.classList.remove('flex');
+            screen.classList.add('hidden');
+            addSystemLog("SYSTEM REBOOT SEQUENCE COMPLETED.");
+          }, 800);
+        }
+      }
+      runStep();
+    }
+
+    // CHATBOT SIMULATOR
+    function sendChatMessage() {
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if(!text) return;
+      
+      addChatMessage('user', text);
+      input.value = '';
+      
+      setTimeout(() => {
+        let response = `<strong>Search Result Analysis:</strong><br>Query analyzed. Search terms parsed into system matrices.<br>No specific database match found. Generative diagnostics recommend checking typical part data-sheets or using standard Arduino pin maps for testing.`;
+        
+        const lowText = text.toLowerCase();
+        for(let key in CHAT_RESPONSES) {
+          if(lowText.includes(key)) {
+            response = CHAT_RESPONSES[key];
+            break;
+          }
+        }
+        addChatMessage('ai', response);
+        addSystemLog(`AI Query solved for terms: "${text.slice(0, 15)}"`);
+      }, 700);
+    }
+
+    function askPreset(promptText) {
+      document.getElementById('chat-input').value = promptText;
+      sendChatMessage();
+    }
+
+    function addChatMessage(sender, content) {
+      const box = document.getElementById('chat-box');
+      const bubble = document.createElement('div');
+      bubble.className = sender === 'user' 
+        ? "bg-cyan-500/10 text-cyan-200 border border-cyan-500/20 p-3 rounded-2xl max-w-[85%] self-end ml-auto backdrop-blur-md shadow-lg"
+        : "bg-white/5 text-slate-200 border border-white/10 p-3 rounded-2xl max-w-[85%] self-start mr-auto backdrop-blur-md shadow-lg";
+      bubble.innerHTML = content;
+      box.appendChild(bubble);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    // CIRCUIT DESIGN ENGINE
+    function prefillCircuitPrompt(txt) {
+      document.getElementById('circuit-prompt').value = txt;
+    }
+
+    function generateCircuit() {
+      const prompt = document.getElementById('circuit-prompt').value.trim();
+      let key = 'Smart Irrigation System';
+      for(let k in CIRCUITS_DATA) {
+        if(prompt.toLowerCase().includes(k.toLowerCase()) || k.toLowerCase().includes(prompt.toLowerCase())) {
+          key = k;
+          break;
+        }
+      }
+      
+      const data = CIRCUITS_DATA[key];
+      currentSelectedCircuit = data;
+      
+      // Update interface
+      document.getElementById('circuit-title').innerText = data.title;
+      
+      const compList = document.getElementById('circuit-components');
+      compList.innerHTML = '';
+      data.components.forEach(c => {
+        const li = document.createElement('li');
+        li.innerText = c;
+        compList.appendChild(li);
+      });
+      
+      const pwrList = document.getElementById('circuit-power');
+      pwrList.innerHTML = '';
+      data.power.forEach(p => {
+        const div = document.createElement('div');
+        div.innerText = "⚡ " + p;
+        pwrList.appendChild(div);
+      });
+      
+      const pinsList = document.getElementById('circuit-pins');
+      pinsList.innerHTML = '';
+      data.connections.forEach(conn => {
+        const tr = document.createElement('tr');
+        tr.className = "border-b border-slate-800/40 text-slate-300";
+        tr.innerHTML = `<td class="py-1">${conn.from}</td><td>${conn.fPin}</td><td>${conn.to}</td><td>${conn.tPin}</td>`;
+        pinsList.appendChild(tr);
+      });
+
+      // Update code blocks
+      updateCodeBlock();
+      
+      // Render animated schematic SVG
+      renderSchematicDiagram(data.schema);
+
+      document.getElementById('circuit-output-card').classList.remove('hidden');
+      addSystemLog(`Circuit Generated: ${data.title}`);
+    }
+
+    function renderSchematicDiagram(nodes) {
+      const box = document.getElementById('schematic-canvas');
+      let svg = `<svg width="100%" height="100%" viewBox="0 0 400 240" class="w-full h-full text-slate-400">`;
+      
+      // Connection paths / traces
+      svg += `<path d="M 140 80 L 300 80" stroke="#00f0ff" stroke-width="2" fill="none" stroke-dasharray="5 5" class="animate-pulse" />`;
+      svg += `<path d="M 140 100 L 200 100 L 200 150" stroke="#ff007a" stroke-width="2" fill="none" />`;
+      
+      nodes.forEach(n => {
+        let color = '#bd00ff';
+        if(n.type === 'mcu') color = '#00f0ff';
+        if(n.type === 'sensor') color = '#39ff14';
+        if(n.type === 'actuator') color = '#ff007a';
+        
+        svg += `
+          <g transform="translate(${n.x}, ${n.y})">
+            <rect width="80" height="45" rx="5" fill="#0a0f24" stroke="${color}" stroke-width="2" class="neon-border"/>
+            <text x="40" y="25" fill="#ffffff" font-family="monospace" font-size="10" text-anchor="middle" font-weight="bold">${n.name}</text>
+          </g>
+        `;
+      });
+      svg += `</svg>`;
+      box.innerHTML = svg;
+    }
+
+    // CODE BLOCK TERMINAL
+    function setCodeLang(lang) {
+      codeLanguage = lang;
+      document.getElementById('btn-lang-arduino').className = lang === 'arduino' ? "text-xs bg-cyan-500/20 text-cyan-400 border border-cyan-400/30 px-2.5 py-1 rounded" : "text-xs bg-slate-900 text-slate-400 border border-slate-800 px-2.5 py-1 rounded hover:bg-slate-800";
+      document.getElementById('btn-lang-python').className = lang === 'python' ? "text-xs bg-cyan-500/20 text-cyan-400 border border-cyan-400/30 px-2.5 py-1 rounded" : "text-xs bg-slate-900 text-slate-400 border border-slate-800 px-2.5 py-1 rounded hover:bg-slate-800";
+      updateCodeBlock();
+    }
+
+    function updateCodeBlock() {
+      if(!currentSelectedCircuit) return;
+      const code = currentSelectedCircuit.code[codeLanguage];
+      document.getElementById('code-block').innerText = code;
+      
+      const explanations = {
+        'arduino': [
+          "Connect the microcontroller to your USB port and select the COM channel in the Arduino IDE.",
+          "Install library dependencies using the Sketch -> Include Library menus.",
+          "Ensure pin mappings match digital inputs exactly to avoid short-circuit thresholds."
+        ],
+        'python': [
+          "Transfer main.py firmware to the root drive of the microcontroller flash using Thonny.",
+          "Verify machine, Pin, and ADC module variables are loaded upon boot.",
+          "Check serial prints in terminal loop debugging output."
+        ]
+      };
+      
+      const explanationBox = document.getElementById('code-explanation');
+      explanationBox.innerHTML = '';
+      explanations[codeLanguage].forEach(exp => {
+        const li = document.createElement('li');
+        li.innerText = exp;
+        explanationBox.appendChild(li);
+      });
+    }
+
+    function copyCode() {
+      const code = document.getElementById('code-block').innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        addSystemLog("Firmware copied to clipboard.");
+      });
+    }
+
+    // PCB AUTO-ROUTING SIMULATOR
+    let pcbCtx, pcbRoutingInterval;
+    function initPcbCanvas() {
+      const canvas = document.getElementById('pcb-canvas');
+      pcbCtx = canvas.getContext('2d');
+      drawPcbStandby();
+    }
+
+    function drawPcbStandby() {
+      pcbCtx.clearRect(0,0,480,300);
+      pcbCtx.strokeStyle = 'rgba(0, 240, 255, 0.1)';
+      pcbCtx.lineWidth = 1;
+      for(let x=0; x<480; x+=20) {
+        pcbCtx.beginPath(); pcbCtx.moveTo(x,0); pcbCtx.lineTo(x,300); pcbCtx.stroke();
+      }
+      for(let y=0; y<300; y+=20) {
+        pcbCtx.beginPath(); pcbCtx.moveTo(0,y); pcbCtx.lineTo(480,y); pcbCtx.stroke();
+      }
+      
+      // Draw component placeholders
+      pcbCtx.strokeStyle = '#bd00ff';
+      pcbCtx.strokeRect(50, 80, 100, 140);
+      pcbCtx.fillStyle = '#bd00ff';
+      pcbCtx.font = '10px monospace';
+      pcbCtx.fillText('ESP32 MCU', 70, 150);
+
+      pcbCtx.strokeStyle = '#00f0ff';
+      pcbCtx.strokeRect(280, 50, 120, 80);
+      pcbCtx.fillStyle = '#00f0ff';
+      pcbCtx.fillText('OLED SCREEN', 310, 95);
+    }
+
+    function startAutoRoute() {
+      clearInterval(pcbRoutingInterval);
+      const btn = document.getElementById('pcb-start-btn');
+      btn.innerText = "ROUTING...";
+      btn.disabled = true;
+      
+      let progress = 0;
+      let logsBox = document.getElementById('pcb-logs');
+      logsBox.innerHTML = '<div>[OS] AUTO-ROUTE loop active. Mapping routing netlists...</div>';
+      
+      let routes = [
+        { sx: 150, sy: 100, ex: 280, ey: 80, color: '#00f0ff', currentX: 150, currentY: 100 },
+        { sx: 150, sy: 160, ex: 280, ey: 120, color: '#ff007a', currentX: 150, currentY: 160 }
+      ];
+
+      pcbRoutingInterval = setInterval(() => {
+        progress += 4.5;
+        if(progress >= 100) {
+          progress = 100;
+          clearInterval(pcbRoutingInterval);
+          btn.innerText = "START AUTO-ROUTE";
+          btn.disabled = false;
+          addSystemLog("PCB Autorouting complete: 100% routing metrics confirmed.");
+        }
+        
+        document.getElementById('pcb-pct').innerText = progress.toFixed(1) + '%';
+        
+        // Draw PCB Traces in real-time
+        pcbCtx.lineWidth = 2.5;
+        routes.forEach(r => {
+          pcbCtx.strokeStyle = r.color;
+          pcbCtx.beginPath();
+          pcbCtx.moveTo(r.sx, r.sy);
+          
+          let dx = r.ex - r.sx;
+          let midX = r.sx + dx * (progress / 100);
+          
+          pcbCtx.lineTo(midX, r.sy);
+          if (progress > 50) {
+            let dy = r.ey - r.sy;
+            let midY = r.sy + dy * ((progress - 50) / 50);
+            pcbCtx.lineTo(midX, midY);
+            pcbCtx.lineTo(r.ex, r.ey);
+          }
+          pcbCtx.stroke();
+        });
+
+        // Add periodic diagnostics logs
+        if(Math.random() > 0.7) {
+          const randLogs = [
+            `Connecting Net VCC... Trace trace calculations successful.`,
+            `Layer placement verified on FR-4 structural core.`,
+            `Optimizing routing paths to limit signal cross-talk.`
+          ];
+          const div = document.createElement('div');
+          div.innerText = "[OS] " + randLogs[Math.floor(Math.random() * randLogs.length)];
+          logsBox.appendChild(div);
+          logsBox.scrollTop = logsBox.scrollHeight;
+        }
+      }, 150);
+    }
+
+    // ENCYCLOPEDIA / WIKI
+    function renderWikiGrid() {
+      const grid = document.getElementById('wiki-grid');
+      grid.innerHTML = '';
+      WIKI_DATA.forEach(comp => {
+        const card = document.createElement('div');
+        card.className = "neon-border hover:bg-white/10 p-5 transition duration-200 wiki-card";
+        card.setAttribute('data-name', comp.name.toLowerCase());
+        card.innerHTML = `
+          <div class="flex items-center justify-between border-b border-white/10 pb-2.5 mb-3">
+            <span class="font-bold text-cyan-400 font-orbitron tracking-wide">${comp.name}</span>
+            <span class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2.5 py-0.5 rounded-xl font-mono border border-cyan-400/20">${comp.id.toUpperCase()}</span>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed mb-4">${comp.desc}</p>
+          <div class="space-y-1 text-[11px] font-mono text-slate-400">
+            <div><strong>PINOUT:</strong> ${comp.pinout}</div>
+            <div><strong>APPLICATIONS:</strong> ${comp.apps}</div>
+          </div>
+          <div class="mt-4">
+            <button onclick="testInLab('${comp.id}')" class="w-full bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 text-xs py-2 rounded-xl transition border border-cyan-400/25 cursor-pointer font-semibold uppercase tracking-wider">
+              <i class="fa-solid fa-play mr-1.5"></i> Test In Lab
+            </button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function filterWiki() {
+      const val = document.getElementById('wiki-search').value.toLowerCase();
+      document.querySelectorAll('.wiki-card').forEach(card => {
+        const name = card.getAttribute('data-name');
+        if(name.includes(val)) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    }
+
+    function testInLab(id) {
+      const comp = WIKI_DATA.find(c => c.id === id);
+      if(comp) {
+        labVoltage = comp.v;
+        labResistance = comp.r;
+        document.getElementById('lab-v-slider').value = labVoltage;
+        document.getElementById('lab-r-slider').value = labResistance;
+        updateLabParams();
+        switchTab('virtual-lab');
+        addSystemLog(`Lab initialized with ${comp.name} specifications.`);
+      }
+    }
+
+    // MULTIMETER / OHM'S LAW LAB ENGINE
+    function updateLabParams() {
+      labVoltage = parseFloat(document.getElementById('lab-v-slider').value);
+      labResistance = parseFloat(document.getElementById('lab-r-slider').value);
+      
+      document.getElementById('lab-v-val').innerText = labVoltage.toFixed(1) + ' V';
+      document.getElementById('lab-r-val').innerText = labResistance + ' Ω';
+
+      // Ohm's law
+      const currentAmps = labVoltage / labResistance;
+      const currentMA = currentAmps * 1000;
+      const powerMW = currentAmps * labVoltage * 1000;
+
+      document.getElementById('meter-i').innerText = currentMA.toFixed(2) + ' mA';
+      document.getElementById('meter-p').innerText = powerMW.toFixed(1) + ' mW';
+
+      // Update right sidebar telemetry simultaneously
+      document.getElementById('tele-v').innerText = labVoltage.toFixed(2) + ' V';
+      document.getElementById('tele-i').innerText = currentMA.toFixed(2) + ' mA';
+      document.getElementById('tele-r').innerText = labResistance.toFixed(1) + ' Ω';
+      document.getElementById('tele-p').innerText = powerMW.toFixed(2) + ' mW';
+
+      document.getElementById('dash-v').innerText = labVoltage.toFixed(1) + 'V';
+      document.getElementById('dash-i').innerText = currentMA.toFixed(1) + 'mA';
+    }
+
+    // FLOWING ELECTRONS WIRE SIMULATION
+    let wireCtx, wireY = 50, particleX = 0;
+    function initWireCanvas() {
+      const canvas = document.getElementById('circuit-wire-canvas');
+      wireCtx = canvas.getContext('2d');
+      requestAnimationFrame(drawElectronsFlow);
+    }
+
+    function drawElectronsFlow() {
+      wireCtx.clearRect(0,0,480,100);
+      
+      // Draw wires outline
+      wireCtx.strokeStyle = 'rgba(0, 240, 255, 0.15)';
+      wireCtx.lineWidth = 14;
+      wireCtx.beginPath();
+      wireCtx.moveTo(30, 50);
+      wireCtx.lineTo(450, 50);
+      wireCtx.stroke();
+
+      // Current calculations
+      const currentAmps = labVoltage / labResistance;
+      const speed = currentAmps * 35; // velocity proportional to current
+
+      // Draw moving charges/electrons
+      wireCtx.fillStyle = '#39ff14';
+      particleX += speed;
+      if(particleX > 450) particleX = 30;
+
+      for (let i = 0; i < 6; i++) {
+        let pX = (particleX + i * 70) % 420 + 30;
+        wireCtx.beginPath();
+        wireCtx.arc(pX, 50, 5, 0, Math.PI * 2);
+        wireCtx.fill();
+      }
+
+      // Wire terminals
+      wireCtx.fillStyle = '#00f0ff';
+      wireCtx.font = '9px monospace';
+      wireCtx.fillText("A (+) TERMINAL", 25, 35);
+      wireCtx.fillText("B (-) GROUND", 400, 35);
+
+      requestAnimationFrame(drawElectronsFlow);
+    }
+
+    // OSCILLOSCOPE SIGNAL VISUALIZER
+    let scopeCtx, waveType = 'sine', freqVal = 40, ampVal = 25, offset = 0;
+    function initOscilloscopeCanvas() {
+      const canvas = document.getElementById('scope-canvas');
+      scopeCtx = canvas.getContext('2d');
+      requestAnimationFrame(drawOscilloscope);
+    }
+
+    function setWave(type) {
+      waveType = type;
+      document.getElementById('scope-type-text').innerText = type.toUpperCase();
+      addSystemLog(`Oscilloscope feed set to: ${type.toUpperCase()}`);
+    }
+
+    function updateWaveParams() {
+      freqVal = parseInt(document.getElementById('scope-freq').value);
+      ampVal = parseInt(document.getElementById('scope-amp').value);
+      document.getElementById('scope-f-text').innerText = freqVal + ' Hz';
+      document.getElementById('scope-a-text').innerText = ampVal + ' V';
+    }
+
+    function drawOscilloscope() {
+      scopeCtx.clearRect(0, 0, 280, 150);
+      
+      // Draw Grid Background
+      scopeCtx.strokeStyle = 'rgba(0, 240, 255, 0.08)';
+      scopeCtx.lineWidth = 1;
+      for (let x = 0; x < 280; x += 20) {
+        scopeCtx.beginPath(); scopeCtx.moveTo(x, 0); scopeCtx.lineTo(x, 150); scopeCtx.stroke();
+      }
+      for (let y = 0; y < 150; y += 20) {
+        scopeCtx.beginPath(); scopeCtx.moveTo(0, y); scopeCtx.lineTo(280, y); scopeCtx.stroke();
+      }
+
+      // Draw Center line
+      scopeCtx.strokeStyle = 'rgba(255, 0, 122, 0.2)';
+      scopeCtx.beginPath(); scopeCtx.moveTo(0, 75); scopeCtx.lineTo(280, 75); scopeCtx.stroke();
+
+      // Draw waveform
+      scopeCtx.strokeStyle = '#00f0ff';
+      scopeCtx.lineWidth = 2.5;
+      scopeCtx.beginPath();
+      
+      offset += 0.15;
+      
+      for (let x = 0; x < 280; x++) {
+        let y = 75;
+        let angle = (x / 280) * Math.PI * 2 * (freqVal / 10) + offset;
+        
+        if (waveType === 'sine') {
+          y = 75 + Math.sin(angle) * ampVal;
+        } else if (waveType === 'square') {
+          y = 75 + (Math.sin(angle) >= 0 ? 1 : -1) * ampVal;
+        } else if (waveType === 'tri') {
+          y = 75 + (Math.abs((angle % (Math.PI * 2)) - Math.PI) / Math.PI * 2 - 1) * ampVal;
+        } else if (waveType === 'noise') {
+          y = 75 + (Math.sin(angle) * ampVal) + (Math.random() - 0.5) * 12;
+        }
+        
+        if (x === 0) scopeCtx.moveTo(x, y);
+        else scopeCtx.lineTo(x, y);
+      }
+      scopeCtx.stroke();
+      requestAnimationFrame(drawOscilloscope);
+    }
+
+    // AI TROUBLESHOOTING REPAIR SYSTEMS
+    function runDiagnostics() {
+      const select = document.getElementById('trouble-select');
+      const symptom = select.value;
+      const outputs = {
+        'led-off': {
+          anomaly: "LED Inactive Fault Detected",
+          causes: ["LED reverse polarized (connected backwards).", "Current-limiting resistor value too high.", "GPIO pin configuration set to INPUT instead of OUTPUT."],
+          actions: ["Verify long LED lead is connected to positive (+) rail.", "Measure resistor output - swap with 220Ω-330Ω.", "Trace terminal output code: 'pinMode(PIN, OUTPUT)'."],
+          safety: "Standard low voltage safe. Ensure logic rails do not exceed 5.5V to avoid IC damage."
+        },
+        'esp32-reset': {
+          anomaly: "SoC Continuous Restart Cycle",
+          causes: ["Transient spike current when Wi-Fi connects exceeded USB limits.", "Boot GPIO pin connected to low logic state during startup.", "Watchdog timer timeout (infinite delay loop)."],
+          actions: ["Solder 100µF decoupling capacitor across VCC and GND pins.", "Verify GPIO0 pin is pulled HIGH during initial boot.", "Review RTOS timers; avoid blocking delays inside main cycles."],
+          safety: "Decoupling capacitor contains charged energy. Discharge safely using a discharge resistor."
+        },
+        'short': {
+          anomaly: "Voltage Rail Collapse Short-Circuit Anomaly",
+          causes: ["Bare wire connection bridging positive supply directly to ground.", "Solder bridge on PCB design tracks connecting adjacent pins.", "Damaged/melted silicon junctions inside integrated circuits."],
+          actions: ["Instantly terminate USB power to prevent system fuse blow.", "Perform continuity multimeter tests to locate bridging points.", "Replace suspected ICs exhibiting high thermal dissipation."],
+          safety: "CRITICAL: Short circuits generate sudden intense heat. Do not touch components immediately following shutdown."
+        },
+        'noise': {
+          anomaly: "Sensor Signal Transient Fluctuations",
+          causes: ["Inductive interference from adjacent motors/relays.", "Analog reference line lacks shielding.", "Excessive ripple on power regulator output."],
+          actions: ["Include Flyback diodes on inductive relay solenoid coils.", "Add simple RC low-pass filter to digital sensor lines.", "Utilize high-precision LDO regulators to clean digital rails."],
+          safety: "Shield routing protects sensitive nodes. Ground shielding braids only at one common terminal."
+        }
+      };
+
+      const scanner = document.getElementById('diag-scanner');
+      const results = document.getElementById('diag-results');
+      const bar = document.getElementById('diag-bar');
+      const pct = document.getElementById('diag-pct');
+      
+      scanner.classList.remove('hidden');
+      results.classList.add('hidden');
+      document.getElementById('trouble-output-card').classList.remove('hidden');
+      
+      let progress = 0;
+      let interval = setInterval(() => {
+        progress += 8;
+        if(progress >= 100) {
+          progress = 100;
+          clearInterval(interval);
+          scanner.classList.add('hidden');
+          results.classList.remove('hidden');
+          
+          const info = outputs[symptom];
+          document.getElementById('trouble-anomaly').innerText = info.anomaly;
+          
+          const causesBox = document.getElementById('trouble-causes');
+          causesBox.innerHTML = '';
+          info.causes.forEach(c => {
+            const li = document.createElement('li');
+            li.innerText = c;
+            causesBox.appendChild(li);
+          });
+
+          const actionsBox = document.getElementById('trouble-actions');
+          actionsBox.innerHTML = '';
+          info.actions.forEach(a => {
+            const li = document.createElement('li');
+            li.innerText = a;
+            actionsBox.appendChild(li);
+          });
+
+          document.getElementById('trouble-safety').innerText = info.safety;
+          addSystemLog(`Diagnostics run complete for symptom: ${symptom.toUpperCase()}`);
+        }
+        bar.style.width = progress + '%';
+        pct.innerText = progress + '%';
+      }, 80);
+    }
+  </script>
+</body>
+</html>
