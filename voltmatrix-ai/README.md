@@ -2,11 +2,7 @@
 
 Build and deploy your AI Studio app.
 
-This project contains everything you need to run your app locally.
-
-## View in Google AI Studio
-
-https://ai.studio/apps/b8390c46-8d3f-46ab-b71f-c19805b1cad4
+This project contains everything you need to run your app locally
 
 ## Run Locally
 
